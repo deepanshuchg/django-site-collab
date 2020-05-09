@@ -4,15 +4,19 @@ from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 
+
 # Create your views here.
 def index(request):
     return render(request,'users/index.html')
 
+
 def login(request):
     return render(request,'users/login.html')
 
+
 def logout(request):
     return render(request,'users/logout.html')
+
 
 def register(request):
     if request.method == "POST":
@@ -23,8 +27,9 @@ def register(request):
             messages.success(request, f'Your account has been created, please Log in.')
             return redirect('login')
     else:
-        form=UserCreationForm()
+        form = UserCreationForm()
     return render(request, 'users/register.html', {'form': form})
+
 
 @login_required
 def youtube(request):
