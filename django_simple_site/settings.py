@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 'users',
 ]
 
 MIDDLEWARE = [
