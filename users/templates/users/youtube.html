@@ -1,7 +1,9 @@
 {% extends "users/base.html" %}
 {% block content %}
-<form action="#">
+<form action = "{% url 'youtube' %}" method = "post">
+    
     <label>Enter youtube channel name:</label>
+    {% csrf_token %}
     <input type="text" id="fname" name="fname"><br><br>
     <input type="submit" value="Submit">
   </form>

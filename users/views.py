@@ -35,37 +35,41 @@ def register(request):
 
 @login_required
 def youtube(request):
-    search_url = 'https://www.googleapis.com/youtube/v3/channels'
+    if request.method == "POST":
+        channel_name = request.POST.get('fname')
+        print(channel_name)
+        search_url = 'https://www.googleapis.com/youtube/v3/channels'
 
-    params = {
-        'part': 'snippet,contentDetails,statistics',
-        'forUsername': 'GoogleDevelopers',
-        'key': settings.YOUTUBE_DATA_API_KEY,
-    }
+        params = {
+            'part': 'snippet,contentDetails,statistics',
+            'forUsername': channel_name,
+            'key': settings.YOUTUBE_DATA_API_KEY,
+        }
 
-    res_channel = requests.get(search_url, params=params)
-    playlist_id = res_channel.json()['items'][0]['contentDetails']['relatedPlaylists']['uploads']
-    playlist_url = 'https://www.googleapis.com/youtube/v3/playlistItems'
-    params_playlist = {
-        'part': 'snippet,contentDetails',
-        'playlistId': playlist_id,
-        'key': settings.YOUTUBE_DATA_API_KEY
+        res_channel = requests.get(search_url, params=params)
+        playlist_id = res_channel.json()['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+        playlist_url = 'https://www.googleapis.com/youtube/v3/playlistItems'
+        params_playlist = {
+            'part': 'snippet,contentDetails',
+            'playlistId': playlist_id,
+            'key': settings.YOUTUBE_DATA_API_KEY
 
-    }
+        }
 
-    videos = []
-    next_page_token = None
-    # while 1:
-    #    res = requests.get(search_url,playlistId = playlist_id,
-    #                  part = 'snippet',
-    #                  maxresult='10',
-    #                       pageToken = next_page_token)
-    #    videos += res['items']
-    #    next_page_token = res['nextPageToken']
-    #
-    #    if next_page_token is None:
-    #     break
-    # print(videos)
-    res_playlist = requests.get(playlist_url, params=params_playlist)
-    print(res_playlist.text)
+        videos = []
+        next_page_token = None
+        # while 1:
+        #    res = requests.get(search_url,playlistId = playlist_id,
+        #                  part = 'snippet',
+        #                  maxresult='10',
+        #                       pageToken = next_page_token)
+        #    videos += res['items']
+        #    next_page_token = res['nextPageToken']
+        #
+        #    if next_page_token is None:
+        #     break
+        # print(videos)
+        res_playlist = requests.get(playlist_url, params=params_playlist)
+        print(res_playlist.text)
+
     return render(request, 'users/youtube.html')
