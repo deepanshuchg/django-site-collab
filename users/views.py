@@ -5,6 +5,7 @@ import requests
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+import urllib.request, json
 
 
 # Create your views here.
@@ -36,40 +37,55 @@ def register(request):
 @login_required
 def youtube(request):
     if request.method == "POST":
-        channel_name = request.POST.get('fname')
-        print(channel_name)
-        search_url = 'https://www.googleapis.com/youtube/v3/channels'
+        channel_name = request.POST.get('channel_name')
+        channel_id = request.POST.get('channel_id')
+        if channel_id == "":                                #Considering Channel name is entered
 
-        params = {
-            'part': 'snippet,contentDetails,statistics',
-            'forUsername': channel_name,
-            'key': settings.YOUTUBE_DATA_API_KEY,
-        }
+            search_url = 'https://www.googleapis.com/youtube/v3/channels'
 
-        res_channel = requests.get(search_url, params=params)
-        playlist_id = res_channel.json()['items'][0]['contentDetails']['relatedPlaylists']['uploads']
-        playlist_url = 'https://www.googleapis.com/youtube/v3/playlistItems'
-        params_playlist = {
-            'part': 'snippet,contentDetails',
-            'playlistId': playlist_id,
-            'key': settings.YOUTUBE_DATA_API_KEY
+            params = {
+                'part': 'snippet,contentDetails,statistics',
+                'forUsername': channel_name,
+                'key': settings.YOUTUBE_DATA_API_KEY,
+            }
 
-        }
+            res_channel = requests.get(search_url, params=params)
+            playlist_id = res_channel.json()['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+            playlist_url = 'https://www.googleapis.com/youtube/v3/playlistItems'
+            params_playlist = {
+                'part': 'snippet,contentDetails',
+                'playlistId': playlist_id,
+                'key': settings.YOUTUBE_DATA_API_KEY
 
-        videos = []
-        next_page_token = None
-        # while 1:
-        #    res = requests.get(search_url,playlistId = playlist_id,
-        #                  part = 'snippet',
-        #                  maxresult='10',
-        #                       pageToken = next_page_token)
-        #    videos += res['items']
-        #    next_page_token = res['nextPageToken']
-        #
-        #    if next_page_token is None:
-        #     break
-        # print(videos)
-        res_playlist = requests.get(playlist_url, params=params_playlist)
-        print(res_playlist.text)
+            }
+
+            videos = []
+            next_page_token = None
+            # while 1:
+            #    res = requests.get(search_url,playlistId = playlist_id,
+            #                  part = 'snippet',
+            #                  maxresult='10',
+            #                       pageToken = next_page_token)
+            #    videos += res['items']
+            #    next_page_token = res['nextPageToken']
+            #
+            #    if next_page_token is None:
+            #     break
+            # print(videos)
+            res_playlist = requests.get(playlist_url, params=params_playlist)
+            print(res_playlist.text)
+    
+        else:       #Considering channel ID is entered
+
+            search_url = f"https://www.googleapis.com/youtube/v3/channels?part=statistics&id={channel_id}&key={settings.YOUTUBE_DATA_API_KEY}"
+            data = urllib.request.urlopen(search_url).read()
+
+            subscribers = json.loads(data)['items'][0]['statistics']['subscriberCount']
+            total_videos = json.loads(data)['items'][0]['statistics']['videoCount']
+            total_views = json.loads(data)['items'][0]['statistics']['viewCount']
+
+            print(f"\nTotal number of subscribers: {subscribers}")
+            print(f"Total number of videos uploaded: {total_videos}")
+            print(f"Total views on the channel: {total_views}\n")
 
     return render(request, 'users/youtube.html')

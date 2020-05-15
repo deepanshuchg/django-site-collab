@@ -4,7 +4,9 @@
     
     <label>Enter youtube channel name:</label>
     {% csrf_token %}
-    <input type="text" id="fname" name="fname"><br><br>
+    <input type="text" id="channel_name" name="channel_name"><br><br>
+    <label>Enter youtube channel ID:</label>
+    <input type="text" id="channel_id" name="channel_id"><br><br>
     <input type="submit" value="Submit">
   </form>
 {% endblock content %}
